@@ -1,3 +1,5 @@
+import axios from "axios";
+import { useState, ChangeEvent, FormEvent } from "react";
 import {
   Box,
   Grid,
@@ -6,23 +8,81 @@ import {
   Typography,
   Select,
   MenuItem,
-  TextareaAutosize,
   Button,
 } from "@mui/material";
-import { styled } from "@mui/system";
+import { useDispatch } from "react-redux";
+import { toggleShow } from "../Slices/createStudentProfile";
+
+interface FormData {
+  firstName: string;
+  lastName: string;
+  email: string;
+  password: string;
+  age: string;
+  phoneNumber: string;
+  address: string;
+  userName: string;
+  gender: string;
+  location: string;
+  preference: string[];
+}
 
 const CreateStudent = () => {
-  const StyledTextArea = styled(TextareaAutosize)(
-    () => `
-      width: 93%;
-      resize: none;
-      border: 1px solid #ccc;
-      padding: 8px;
-        `
-  );
+  const [formData, setFormData] = useState<FormData>({
+    firstName: "",
+    lastName: "",
+    email: "",
+    password: "",
+    age: "",
+    phoneNumber: "",
+    address: "",
+    userName: "",
+    gender: "",
+    location: "",
+    preference: [],
+  });
+
+  const dispatch = useDispatch();
+
+  const handleToggle = () => {
+    dispatch(toggleShow());
+  };
+
+  const handleSubmit = async (event: FormEvent) => {
+    event.preventDefault();
+
+    try {
+      const response = await axios.post("/v1/admin/users/create", formData);
+      console.log("Response from API:", response.data);
+    } catch (error) {
+      console.error("Error while sending POST request:", error);
+    }
+    handleToggle();
+  };
+
+  const handleInputChange = (
+    event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    const { name, value } = event.target;
+    setFormData((prevData) => ({
+      ...prevData,
+      [name]: value,
+    }));
+  };
+
+  const handleSelectChange = (
+    event: ChangeEvent<{ name?: string; value: unknown }>
+  ) => {
+    const { name, value } = event.target;
+    setFormData((prevData) => ({
+      ...prevData,
+      [name as string]: value,
+    }));
+  };
+
   return (
     <Box
-      component={"div"}
+      component="div"
       sx={{
         width: "100vw",
         height: "100vh",
@@ -34,7 +94,7 @@ const CreateStudent = () => {
       }}
     >
       <Box
-        component={"div"}
+        component="div"
         sx={{
           width: "55%",
           height: "100vh",
@@ -57,12 +117,15 @@ const CreateStudent = () => {
         >
           Create Student Profile
         </Typography>
-        <form>
+        <form onSubmit={handleSubmit}>
           <Grid container spacing={2}>
             <Grid item xs={6}>
               <InputLabel htmlFor="first-name">First Name</InputLabel>
               <TextField
                 id="first-name"
+                name="firstName"
+                value={formData.firstName}
+                onChange={handleInputChange}
                 placeholder="First Name"
                 variant="outlined"
                 sx={{ width: "85%", boxShadow: "3px 3px 10px 2px lightgrey" }}
@@ -72,42 +135,57 @@ const CreateStudent = () => {
               <InputLabel htmlFor="last-name">Last Name</InputLabel>
               <TextField
                 id="last-name"
+                name="lastName"
+                value={formData.lastName}
+                onChange={handleInputChange}
                 placeholder="Last Name"
                 variant="outlined"
                 sx={{ width: "85%", boxShadow: "3px 3px 10px 2px lightgrey" }}
               />
             </Grid>
             <Grid item xs={6} sx={{ marginTop: "1rem" }}>
-              <InputLabel htmlFor="last-name">User Name</InputLabel>
+              <InputLabel htmlFor="user-name">User Name</InputLabel>
               <TextField
                 id="user-name"
+                name="userName"
+                value={formData.userName}
+                onChange={handleInputChange}
                 placeholder="User Name"
                 variant="outlined"
                 sx={{ width: "85%", boxShadow: "3px 3px 10px 2px lightgrey" }}
               />
             </Grid>
             <Grid item xs={6} sx={{ marginTop: "1rem" }}>
-              <InputLabel htmlFor="last-name">Email</InputLabel>
+              <InputLabel htmlFor="email">Email</InputLabel>
               <TextField
                 id="email"
+                name="email"
+                value={formData.email}
+                onChange={handleInputChange}
                 placeholder="Email"
                 variant="outlined"
                 sx={{ width: "85%", boxShadow: "3px 3px 10px 2px lightgrey" }}
               />
             </Grid>
             <Grid item xs={6} sx={{ marginTop: "1rem" }}>
-              <InputLabel htmlFor="last-name">Mobile Number</InputLabel>
+              <InputLabel htmlFor="mobile-number">Mobile Number</InputLabel>
               <TextField
                 id="mobile-number"
+                name="phoneNumber"
+                value={formData.phoneNumber}
+                onChange={handleInputChange}
                 placeholder="Mobile Number"
                 variant="outlined"
                 sx={{ width: "85%", boxShadow: "3px 3px 10px 2px lightgrey" }}
               />
             </Grid>
             <Grid item xs={6} sx={{ marginTop: "1rem" }}>
-              <InputLabel htmlFor="last-name">Age</InputLabel>
+              <InputLabel htmlFor="age">Age</InputLabel>
               <TextField
                 id="age"
+                name="age"
+                value={formData.age}
+                onChange={handleInputChange}
                 placeholder="Age"
                 type="number"
                 variant="outlined"
@@ -119,6 +197,9 @@ const CreateStudent = () => {
               <Select
                 labelId="gender"
                 id="gender"
+                name="gender"
+                value={formData.gender}
+                onChange={handleSelectChange}
                 variant="outlined"
                 sx={{ width: "85%", boxShadow: "3px 3px 10px 2px lightgrey" }}
               >
@@ -127,40 +208,59 @@ const CreateStudent = () => {
               </Select>
             </Grid>
             <Grid item xs={6} sx={{ marginTop: "1rem" }}>
-              <InputLabel htmlFor="last-name">Location</InputLabel>
+              <InputLabel htmlFor="location">Location</InputLabel>
               <TextField
                 id="location"
+                name="location"
+                value={formData.location}
+                onChange={handleInputChange}
                 placeholder="Location"
-                type="textarea"
+                type="text"
                 variant="outlined"
                 sx={{ width: "85%", boxShadow: "3px 3px 10px 2px lightgrey" }}
               />
             </Grid>
             <Grid item xs={12} sx={{ marginTop: "1rem" }}>
-              <InputLabel htmlFor="last-name">Address</InputLabel>
-              <StyledTextArea
+              <InputLabel htmlFor="address">Address</InputLabel>
+              <textarea
                 id="address"
-                minRows={6}
-                sx={{ boxShadow: "3px 3px 10px 2px lightgrey" }}
+                name="address"
+                value={formData.address}
+                onChange={handleInputChange}
+                rows={6}
+                style={{
+                  width: "94%",
+                  boxShadow: "3px 3px 10px 2px lightgrey",
+                  resize: "none",
+                  outline: "none",
+                  border: "none",
+                }}
               />
             </Grid>
             <Grid item xs={6} sx={{ marginTop: "1rem" }}>
-              <InputLabel htmlFor="gender">Language Preference</InputLabel>
+              <InputLabel htmlFor="preference">Language Preference</InputLabel>
               <Select
-                labelId="gender"
-                id="gender"
+                labelId="preference"
+                id="preference"
+                name="preference"
+                multiple
+                value={formData.preference}
+                onChange={handleSelectChange}
                 variant="outlined"
                 sx={{ width: "85%", boxShadow: "3px 3px 10px 2px lightgrey" }}
               >
-                <MenuItem value="Male">English</MenuItem>
-                <MenuItem value="Female">Hindi</MenuItem>
-                <MenuItem value="Female">Tamil</MenuItem>
+                <MenuItem value="English">English</MenuItem>
+                <MenuItem value="Hindi">Hindi</MenuItem>
+                <MenuItem value="Tamil">Tamil</MenuItem>
               </Select>
             </Grid>
             <Grid item xs={6} sx={{ marginTop: "1rem" }}>
-              <InputLabel htmlFor="last-name">Password</InputLabel>
+              <InputLabel htmlFor="password">Password</InputLabel>
               <TextField
                 id="password"
+                name="password"
+                value={formData.password}
+                onChange={handleInputChange}
                 placeholder="Password"
                 type="password"
                 variant="outlined"
@@ -169,6 +269,7 @@ const CreateStudent = () => {
             </Grid>
             <Grid item xs={12} sx={{ marginTop: "1rem", textAlign: "center" }}>
               <Button
+                type="submit"
                 sx={{
                   bgcolor: "#4E176C",
                   color: "white",
