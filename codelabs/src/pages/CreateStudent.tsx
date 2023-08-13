@@ -52,7 +52,9 @@ const CreateStudent = () => {
     event.preventDefault();
 
     try {
-      const response = await axios.post("/v1/admin/users/create", formData);
+      const response = await axios.post("/v1/admin/users/create", formData, {
+        baseURL: "https://codelabs-server.el.r.appspot.com",
+      });
       console.log("Response from API:", response.data);
     } catch (error) {
       console.error("Error while sending POST request:", error);
